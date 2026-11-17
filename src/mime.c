@@ -1,13 +1,25 @@
 #include <string.h>
 #include "mime.h"
 
-const char *tipo_mime(const char *ruta) {
-    const char *p = strrchr(ruta, '.');
-    if (p == NULL) return "application/octet-stream";
-    if (strcmp(p, ".html") == 0) return "text/html";
-    if (strcmp(p, ".css") == 0)  return "text/css";
-    if (strcmp(p, ".js") == 0)   return "application/javascript";
-    if (strcmp(p, ".png") == 0)  return "image/png";
-    if (strcmp(p, ".jpg") == 0)  return "image/jpeg";
-    return "application/octet-stream";
+const char* buscar_mime(char* ruta) {
+    // Revisamos que extension tiene el archivo
+    if (strstr(ruta, ".html") != NULL) {
+        return "text/html";
+    } 
+    else if (strstr(ruta, ".css") != NULL) {
+        return "text/css";
+    } 
+    else if (strstr(ruta, ".js") != NULL) {
+        return "application/javascript";
+    } 
+    else if (strstr(ruta, ".png") != NULL) {
+        return "image/png";
+    } 
+    else if (strstr(ruta, ".jpg") != NULL) {
+        return "image/jpeg";
+    } 
+    else {
+        // Si no es ninguna, mandamos texto plano
+        return "text/plain";
+    }
 }
