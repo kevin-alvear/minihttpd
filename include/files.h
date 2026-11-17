@@ -1,7 +1,7 @@
 #ifndef FILES_H
 #define FILES_H
 
-int buscar_archivo(const char *uri, char *real);
-char *leer_archivo(const char *ruta, long *tam);
+// Funcion que lee el archivo de la carpeta www
+int leer_archivo(char* pedido, char* buf, int* tam);
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef HTTP_H
 #define HTTP_H
 
-int procesar_solicitud(int fd, char *req, int n);
+// Funcion que recibe el pedido y arma la respuesta HTTP
+int procesar_peticion(char* pedido, char* resp);
 
 #endif
