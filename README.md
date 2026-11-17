@@ -1,9 +1,9 @@
 
 # Proyecto MiniHTTPd
 
-**Materia:** Computación Distribuida
-**Profesor:** Ing. Luis Enrique Mafla
-**Estudiante:** Kevin Alvear
+**Materia:** Computación Distribuida  
+**Profesor:** Ing. Luis Enrique Mafla  
+**Estudiante:** Kevin Alvear  
 **Fecha de entrega:** 20 de Noviembre del 2026
 
 ## ¿Qué es este proyecto?
