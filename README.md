@@ -22,7 +22,10 @@ Escribir en la terminal:
 ./minihttpd
 ```
 
-Luego abrir el navegador y entrar a: `http://localhost:8080`
+Luego abrir el navegador y entrar a: 
+```bash
+`http://localhost:8080`
+```
 
 ## ¿Qué carpetas tiene?
 - `src/`: Aquí están los archivos de código en C.
