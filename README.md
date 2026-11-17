@@ -23,7 +23,7 @@ Escribir en la terminal:
 ```
 
 Luego abrir el navegador y entrar a:  
-<`http://localhost:8080`>  
+<http://localhost:8080>  
 O copiar la URL:
 ```bash
 http://localhost:8080
