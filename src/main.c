@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/epoll.h>
+#include <sys/socket.h> 
 #include "server.h"
 #include "http.h"
 
