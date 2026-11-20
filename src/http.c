@@ -1,68 +1,75 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "http.h"
 #include "mime.h"
 #include "files.h"
 
-int procesar_peticion(char* pedido, char* resp) {
-    char metodo[10];
-    char ruta[200];
-    char contenido[4000];
+// funcion para mandar error
+void enviar_error(int cliente, char* estado) {
+    char resp[200];
+    snprintf(resp, 200, "HTTP/1.1 %s\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n", estado);
+    write(cliente, resp, strlen(resp));
+}
+
+int responder(int cliente, char* pedido) {
+    char metodo[10] = "";
+    char ruta[1000] = "";
+    char version[20] = "";
+    char cabecera[300];
+    char contenido[MAX];
     int tam = 0;
     int estado;
-    const char* tipo;
 
-    // 1. Revisamos que no sea muy largo (Buffer Overflow)
+    // revisar tamano del pedido
     if (strlen(pedido) > 1000) {
-        snprintf(resp, 100, "HTTP/1.1 400 Bad Request\r\n\r\n");
-        return 400;
+        enviar_error(cliente, "400 Bad Request");
+        return 0;
     }
 
-    // 2. Sacamos el metodo y la ruta
+    // revisar que tenga host
+    if (strstr(pedido, "Host:") == NULL) {
+        enviar_error(cliente, "400 Bad Request");
+        return 0;
+    }
+
+    // sacar metodo y ruta
     sscanf(pedido, "%s %s", metodo, ruta);
 
-    // 3. LA CORRECCIÓN: Si piden la raiz "/", pedimos el index.html
-    if (strcmp(ruta, "/") == 0) {
-        snprintf(ruta, 200, "/index.html");
-    }
-
-    // 4. Revisamos si es GET (solo aceptamos GET)
+    // revisar si es get
     if (strcmp(metodo, "GET") != 0) {
-        snprintf(resp, 100, "HTTP/1.1 405 Method Not Allowed\r\n\r\n");
-        return 405;
+        enviar_error(cliente, "405 Method Not Allowed");
+        return 0;
     }
 
-    // 5. Analizamos los encabezados basicos (Host)
-    if (strstr(pedido, "Host:") == NULL) {
-        snprintf(resp, 100, "HTTP/1.1 400 Bad Request\r\n\r\n");
-        return 400;
+    // si es la raiz pedir index
+    if (strcmp(ruta, "/") == 0) {
+        snprintf(ruta, 1000, "/index.html");
     }
 
-    // 6. Buscamos el archivo
+    // buscar archivo
     estado = leer_archivo(ruta, contenido, &tam);
 
-    // 7. Dependiendo del estado, armamos la respuesta
     if (estado == 404) {
-        snprintf(resp, 100, "HTTP/1.1 404 Not Found\r\n\r\n");
+        enviar_error(cliente, "404 Not Found");
     } 
     else if (estado == 403) {
-        snprintf(resp, 100, "HTTP/1.1 403 Forbidden\r\n\r\n");
+        enviar_error(cliente, "403 Forbidden");
     } 
     else if (estado == 500) {
-        snprintf(resp, 100, "HTTP/1.1 500 Internal Server Error\r\n\r\n");
+        enviar_error(cliente, "500 Internal Server Error");
     } 
     else {
-        // Si llegamos aqui, es 200 OK
-        tipo = buscar_mime(ruta);
-        
-        snprintf(resp, 500, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n", tipo, tam);
-        
-        // Pegamos el contenido del archivo
-        memcpy(resp + strlen(resp), contenido, tam);
-        
-        // Le decimos a C donde termina el texto para que no salga basura
-        resp[strlen(resp) + tam] = '\0'; 
+        // mandar respuesta 200
+        snprintf(cabecera, 300, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n", buscar_mime(ruta), tam);
+        write(cliente, cabecera, strlen(cabecera));
+        write(cliente, contenido, tam);
     }
 
-    return estado;
+    // revisar si hay que cerrar
+    if (strstr(pedido, "Connection: close") != NULL) {
+        return 1;
+    }
+    
+    return 0;
 }
