@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-// Funcion que crea y configura el socket del servidor
+// crea el servidor en el puerto
 int crear_servidor(int puerto);
 
 #endif
