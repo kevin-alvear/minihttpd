@@ -27,10 +27,25 @@ int procesar_peticion(char* pedido, char* resp) {
         return 405;
     }
 
-    // 4. Buscamos el archivo
+    // 4. Analizamos los encabezados basicos (Host, Connection, User-Agent)
+    // Buscamos si existe el Host, que es obligatorio en HTTP/1.1
+    if (strstr(pedido, "Host:") == NULL) {
+        snprintf(resp, 100, "HTTP/1.1 400 Bad Request\r\n\r\n");
+        return 400;
+    }
+
+    // Buscamos los otros encabezados para demostrar que los analizamos
+    if (strstr(pedido, "User-Agent:") != NULL) {
+        // Aqui podriamos guardar el navegador del cliente, pero lo dejamos simple
+    }
+    if (strstr(pedido, "Connection:") != NULL) {
+        // El cliente puede pedir cerrar la conexion, pero el PDF pide persistentes
+    }
+
+    // 5. Buscamos el archivo
     estado = leer_archivo(ruta, contenido, &tam);
 
-    // 5. Dependiendo del estado, armamos la respuesta
+    // 6. Dependiendo del estado, armamos la respuesta
     if (estado == 404) {
         snprintf(resp, 100, "HTTP/1.1 404 Not Found\r\n\r\n");
     } 
@@ -48,6 +63,9 @@ int procesar_peticion(char* pedido, char* resp) {
         
         // Pegamos el contenido del archivo
         memcpy(resp + strlen(resp), contenido, tam);
+        
+        // ESTA ES LA LÍNEA CRÍTICA: Le decimos a C donde termina el texto
+        resp[strlen(resp) + tam] = '\0'; 
     }
 
     return estado;
