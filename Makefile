@@ -1,9 +1,10 @@
-# Makefile para compilar el proyecto
-# Para compilar, escribir en la terminal: make
-# Para borrar el ejecutable, escribir: make clean
+CC = gcc
+CFLAGS = -Iinclude -Wall
 
-all:
-	gcc -Iinclude -Wall src/main.c src/server.c src/http.c src/mime.c src/files.c -o minihttpd
+all: minihttpd
+
+minihttpd: src/main.c src/server.c src/http.c src/mime.c src/files.c
+	$(CC) $(CFLAGS) -o minihttpd src/main.c src/server.c src/http.c src/mime.c src/files.c
 
 clean:
 	rm -f minihttpd
